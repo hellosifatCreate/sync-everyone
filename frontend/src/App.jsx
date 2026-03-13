@@ -174,7 +174,9 @@ function AuthScreen({ onLogin }) {
       alert(e.response?.data?.error || "Registration failed");
     } finally { setRload(false); }
   };
-
+{
+  minWeight: 100,
+}
   const Shell = ({ children }) => (
     <div style={{ minHeight:"100vh",minHeight:"100dvh", background:C.bg, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"24px 16px" }}>
       <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:28 }}>
