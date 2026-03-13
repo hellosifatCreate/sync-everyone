@@ -105,3 +105,47 @@ router.post('/:convId/messages', auth, async (req, res) => {
 })
 
 module.exports = router
+
+// ── SEND MEDIA (photo/voice) ──────────────────────────────
+const multer = require('multer')
+const path = require('path')
+const fs = require('fs')
+
+const mediaStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const dir = path.join(__dirname, '..', process.env.UPLOAD_DIR || 'uploads')
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
+    cb(null, dir)
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname) || (file.mimetype.includes('audio') ? '.webm' : '.jpg')
+    cb(null, `msg_${req.user.id}_${Date.now()}${ext}`)
+  }
+})
+const uploadMedia = multer({ storage: mediaStorage, limits: { fileSize: 20 * 1024 * 1024 } })
+
+router.post('/:convId/messages/media', auth, uploadMedia.single('media'), async (req, res) => {
+  const { type } = req.body
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
+  try {
+    const [membership] = await db.query(
+      'SELECT 1 FROM conversation_members WHERE conversation_id=? AND user_id=?',
+      [req.params.convId, req.user.id]
+    )
+    if (!membership.length) return res.status(403).json({ error: 'Access denied' })
+    const id = 'm' + Math.random().toString(36).slice(2, 10)
+    const mediaUrl = `/uploads/${req.file.filename}`
+    await db.query(
+      'INSERT INTO messages (id,conversation_id,user_id,text,media_url,media_type) VALUES (?,?,?,?,?,?)',
+      [id, req.params.convId, req.user.id, '', mediaUrl, type || 'image']
+    )
+    const [rows] = await db.query(
+      'SELECT m.*, u.name, u.handle, u.avatar_url, u.color FROM messages m JOIN users u ON u.id=m.user_id WHERE m.id=?',
+      [id]
+    )
+    res.status(201).json(rows[0])
+  } catch (err) {
+    console.error('Media send error:', err)
+    res.status(500).json({ error: 'Server error: ' + err.message })
+  }
+})

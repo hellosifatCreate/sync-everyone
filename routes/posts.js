@@ -138,3 +138,41 @@ router.get('/user/:userId', auth, async (req, res) => {
 })
 
 module.exports = router
+
+// ── EDIT POST ─────────────────────────────────────────────
+router.put('/:id', auth, async (req, res) => {
+  const { caption } = req.body
+  if (!caption?.trim()) return res.status(400).json({ error: 'Caption required' })
+  try {
+    const [ex] = await db.query('SELECT user_id FROM posts WHERE id=?', [req.params.id])
+    if (!ex.length) return res.status(404).json({ error: 'Post not found' })
+    if (ex[0].user_id !== req.user.id) return res.status(403).json({ error: 'Not your post' })
+    await db.query('UPDATE posts SET caption=? WHERE id=?', [caption.trim(), req.params.id])
+    const [rows] = await db.query(`
+      SELECT p.*, u.name AS author_name, u.handle AS author_handle,
+             u.avatar_url AS author_avatar, u.color AS author_color,
+             (SELECT COUNT(*) FROM likes WHERE post_id=p.id) AS like_count,
+             (SELECT COUNT(*) FROM comments WHERE post_id=p.id) AS comment_count,
+             0 AS liked_by_me
+      FROM posts p JOIN users u ON u.id=p.user_id WHERE p.id=?
+    `, [req.params.id])
+    res.json(rows[0])
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
+// ── DELETE POST ───────────────────────────────────────────
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const [ex] = await db.query('SELECT user_id FROM posts WHERE id=?', [req.params.id])
+    if (!ex.length) return res.status(404).json({ error: 'Post not found' })
+    if (ex[0].user_id !== req.user.id) return res.status(403).json({ error: 'Not your post' })
+    await db.query('DELETE FROM likes WHERE post_id=?', [req.params.id])
+    await db.query('DELETE FROM comments WHERE post_id=?', [req.params.id])
+    await db.query('DELETE FROM posts WHERE id=?', [req.params.id])
+    res.json({ deleted: true })
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' })
+  }
+})
