@@ -128,7 +128,8 @@ function AuthScreen({ onLogin }) {
   const [rerr, setRerr] = useState({});
   const [setup, setSetup] = useState({ bio:"", avatar:null, color:AVATAR_COLORS[0] });
   const [rload, setRload] = useState(false);
-  const [pendingData, setPendingData] = useState(null); // after step1
+  const [pendingData, setPendingData] = useState(null);
+  const fileRef = useRef();
 
   const doLogin = async () => {
     setLerr(""); setLload(true);
@@ -174,11 +175,9 @@ function AuthScreen({ onLogin }) {
       alert(e.response?.data?.error || "Registration failed");
     } finally { setRload(false); }
   };
-{
-  minWeight: 100,
-}
+
   const Shell = ({ children }) => (
-    <div style={{ minHeight:"100vh",minHeight:"100dvh", background:C.bg, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"24px 16px" }}>
+    <div style={{ minHeight:"100dvh", background:C.bg, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", padding:"24px 16px" }}>
       <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:28 }}>
         <div style={{ width:44,height:44,borderRadius:13,background:C.accent,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 12px rgba(196,125,30,0.4)" }}>
           <span style={{ fontFamily:"'Cormorant Garamond',serif",fontSize:20,color:"#fff",fontWeight:700 }}>SE</span>
@@ -225,7 +224,6 @@ function AuthScreen({ onLogin }) {
   );
 
   // Profile setup
-  const fileRef = useRef();
   return (
     <Shell>
       <h2 style={{ fontFamily:"'Cormorant Garamond',serif",fontSize:26,color:C.text,margin:"0 0 4px",fontWeight:700 }}>Set up your profile</h2>
@@ -320,7 +318,7 @@ export default function App() {
         input,textarea{caret-color:${C.accent};}
         input::placeholder,textarea::placeholder{color:${C.dim};}
       `}</style>
-      <div style={{ display:"flex",flexDirection:"column",height:"100vh",height:"100dvh",background:C.bg,maxWidth:600,margin:"0 auto" }}>
+      <div style={{ display:"flex",flexDirection:"column",height:"100dvh",background:C.bg,maxWidth:600,margin:"0 auto" }}>
         {/* TOP BAR */}
         <div style={{ display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",borderBottom:`1px solid ${C.border}`,background:C.surface,boxShadow:C.shadow,flexShrink:0 }}>
           <div style={{ display:"flex",alignItems:"center",gap:10 }}>
