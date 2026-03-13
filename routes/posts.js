@@ -20,7 +20,7 @@ const storage = multer.diskStorage({
 })
 const upload = multer({ storage, limits: { fileSize: 10 * 1024 * 1024 } })
 
-// ── GET FEED (posts from everyone, newest first) ──────────
+// ── GET FEED ──────────────────────────────────────────────
 router.get('/feed', auth, async (req, res) => {
   try {
     const [posts] = await db.query(`
@@ -36,12 +36,21 @@ router.get('/feed', auth, async (req, res) => {
     `, [req.user.id])
     res.json(posts)
   } catch (err) {
-    res.status(500).json({ error: 'Server error' })
+    console.error('Feed error:', err)
+    res.status(500).json({ error: 'Server error: ' + err.message })
   }
 })
 
 // ── CREATE POST ───────────────────────────────────────────
-router.post('/', auth, upload.single('image'), async (req, res) => {
+router.post('/', auth, (req, res, next) => {
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      console.error('Upload error:', err)
+      return res.status(400).json({ error: 'Image upload failed: ' + err.message })
+    }
+    next()
+  })
+}, async (req, res) => {
   const { caption, emoji, tags } = req.body
   if (!caption?.trim()) return res.status(400).json({ error: 'Caption required' })
   const id = 'p' + uid()
@@ -59,7 +68,8 @@ router.post('/', auth, upload.single('image'), async (req, res) => {
     `, [id])
     res.status(201).json(rows[0])
   } catch (err) {
-    res.status(500).json({ error: 'Server error' })
+    console.error('Post create error:', err)
+    res.status(500).json({ error: 'Server error: ' + err.message })
   }
 })
 
@@ -75,6 +85,7 @@ router.post('/:id/like', auth, async (req, res) => {
       res.json({ liked: true })
     }
   } catch (err) {
+    console.error('Like error:', err)
     res.status(500).json({ error: 'Server error' })
   }
 })
@@ -111,7 +122,8 @@ router.post('/:id/comments', auth, async (req, res) => {
 router.get('/user/:userId', auth, async (req, res) => {
   try {
     const [posts] = await db.query(`
-      SELECT p.*, u.name AS author_name, u.handle AS author_handle, u.avatar_url AS author_avatar, u.color AS author_color,
+      SELECT p.*, u.name AS author_name, u.handle AS author_handle,
+             u.avatar_url AS author_avatar, u.color AS author_color,
              (SELECT COUNT(*) FROM likes WHERE post_id=p.id) AS like_count,
              (SELECT COUNT(*) FROM comments WHERE post_id=p.id) AS comment_count,
              EXISTS(SELECT 1 FROM likes WHERE post_id=p.id AND user_id=?) AS liked_by_me
@@ -120,6 +132,7 @@ router.get('/user/:userId', auth, async (req, res) => {
     `, [req.user.id, req.params.userId])
     res.json(posts)
   } catch (err) {
+    console.error('User posts error:', err)
     res.status(500).json({ error: 'Server error' })
   }
 })

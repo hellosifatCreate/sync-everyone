@@ -4,11 +4,11 @@ const auth   = require('../middleware/auth')
 
 const uid = () => Math.random().toString(36).slice(2, 10)
 
-// ── GET ALL CONVERSATIONS FOR CURRENT USER ────────────────
+// ── GET ALL CONVERSATIONS ─────────────────────────────────
 router.get('/', auth, async (req, res) => {
   try {
     const [convs] = await db.query(`
-      SELECT c.*, 
+      SELECT c.*,
              (SELECT text FROM messages WHERE conversation_id=c.id ORDER BY created_at DESC LIMIT 1) AS last_message,
              (SELECT created_at FROM messages WHERE conversation_id=c.id ORDER BY created_at DESC LIMIT 1) AS last_message_time
       FROM conversations c
@@ -17,7 +17,6 @@ router.get('/', auth, async (req, res) => {
       ORDER BY last_message_time DESC
     `, [req.user.id])
 
-    // Attach members for each conversation
     for (const conv of convs) {
       const [members] = await db.query(`
         SELECT u.id,u.name,u.handle,u.avatar_url,u.color
@@ -28,7 +27,8 @@ router.get('/', auth, async (req, res) => {
     }
     res.json(convs)
   } catch (err) {
-    res.status(500).json({ error: 'Server error' })
+    console.error('Get convs error:', err)
+    res.status(500).json({ error: 'Server error: ' + err.message })
   }
 })
 
@@ -36,7 +36,6 @@ router.get('/', auth, async (req, res) => {
 router.post('/direct/:userId', auth, async (req, res) => {
   const otherId = req.params.userId
   try {
-    // Check if direct conv already exists between these two users
     const [existing] = await db.query(`
       SELECT c.id FROM conversations c
       JOIN conversation_members cm1 ON cm1.conversation_id=c.id AND cm1.user_id=?
@@ -52,14 +51,14 @@ router.post('/direct/:userId', auth, async (req, res) => {
     await db.query('INSERT INTO conversation_members (conversation_id,user_id) VALUES (?,?),(?,?)', [id, req.user.id, id, otherId])
     res.status(201).json({ id })
   } catch (err) {
-    res.status(500).json({ error: 'Server error' })
+    console.error('Create conv error:', err)
+    res.status(500).json({ error: 'Server error: ' + err.message })
   }
 })
 
 // ── GET MESSAGES IN CONVERSATION ──────────────────────────
 router.get('/:convId/messages', auth, async (req, res) => {
   try {
-    // Verify user is a member
     const [membership] = await db.query(
       'SELECT 1 FROM conversation_members WHERE conversation_id=? AND user_id=?',
       [req.params.convId, req.user.id]
@@ -75,7 +74,8 @@ router.get('/:convId/messages', auth, async (req, res) => {
     `, [req.params.convId])
     res.json(messages)
   } catch (err) {
-    res.status(500).json({ error: 'Server error' })
+    console.error('Get messages error:', err)
+    res.status(500).json({ error: 'Server error: ' + err.message })
   }
 })
 
@@ -99,7 +99,8 @@ router.post('/:convId/messages', auth, async (req, res) => {
     `, [id])
     res.status(201).json(rows[0])
   } catch (err) {
-    res.status(500).json({ error: 'Server error' })
+    console.error('Send message error:', err)
+    res.status(500).json({ error: 'Server error: ' + err.message })
   }
 })
 
