@@ -2,11 +2,10 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content" />
     <meta name="theme-color" content="#faf8f4" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>Sync Everyone</title>
     <style>
       *, *::before, *::after {
@@ -15,28 +14,28 @@
         padding: 0;
         -webkit-tap-highlight-color: transparent;
       }
-      html, body {
-        width: 100%;
+      html {
         height: 100%;
-        overflow: hidden;
         background: #faf8f4;
         -webkit-text-size-adjust: 100%;
-        text-size-adjust: 100%;
       }
-      #root {
-        width: 100%;
+      body {
         height: 100%;
-        height: 100dvh;
+        background: #faf8f4;
         overflow: hidden;
       }
-      /* Prevent zoom on input focus - CRITICAL for mobile */
+      #root {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      /* Prevent zoom AND prevent layout jump on Android */
       input, textarea, select {
         font-size: 16px !important;
         -webkit-appearance: none;
         appearance: none;
       }
       button {
-        -webkit-tap-highlight-color: transparent;
         touch-action: manipulation;
       }
     </style>
