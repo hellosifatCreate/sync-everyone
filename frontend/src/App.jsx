@@ -29,7 +29,7 @@ function Av({user,size=36,ring=false}){
       border:ring?`2.5px solid ${col}`:`2px solid ${col}44`,
       background:src?"transparent":`${col}18`,
       display:"flex",alignItems:"center",justifyContent:"center",overflow:"hidden"}}>
-      {src?<img src={src} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+      {src?<img src={src} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}} onError={e=>{e.target.style.display="none";e.target.nextSibling.style.display="flex";}} /><span style={{display:"none",fontFamily:"'DM Sans',sans-serif",fontWeight:600,fontSize:size*0.36,color:col}}>{user.initials||mkInitials(user.name||"?")}</span>
           :<span style={{fontFamily:"'DM Sans',sans-serif",fontWeight:600,fontSize:size*0.36,color:col}}>{user.initials||mkInitials(user.name||"?")}</span>}
     </div>
   );
@@ -368,7 +368,7 @@ function AuthScreen({onLogin}){
   };
 
   const Shell=({children})=>(
-    <div style={{minHeight:"100dvh",background:C.bg,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 16px"}}>
+    <div style={{minHeight:"calc(var(--vh, 1vh) * 100)",background:C.bg,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 16px"}}>
       <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:28}}>
         <div style={{width:44,height:44,borderRadius:13,background:C.accent,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 12px rgba(196,125,30,0.4)"}}>
           <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,color:"#fff",fontWeight:700}}>SE</span>
@@ -942,7 +942,7 @@ export default function App(){
   if(loading)return(
     <>
       <style>{FONTS}</style>
-      <div style={{height:"100dvh",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center"}}>
+      <div style={{height:"calc(var(--vh, 1vh) * 100)",background:C.bg,display:"flex",alignItems:"center",justifyContent:"center"}}>
         <div style={{textAlign:"center"}}>
           <div style={{width:50,height:50,borderRadius:14,background:C.accent,display:"flex",alignItems:"center",justifyContent:"center",margin:"0 auto 16px",boxShadow:"0 4px 16px rgba(196,125,30,0.35)"}}>
             <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:22,color:"#fff",fontWeight:700}}>SE</span>
@@ -975,7 +975,7 @@ export default function App(){
         input,textarea{caret-color:${C.accent};}
         input::placeholder,textarea::placeholder{color:${C.dim};}
       `}</style>
-      <div style={{display:"flex",flexDirection:"column",height:"100dvh",background:C.bg,maxWidth:600,margin:"0 auto"}}>
+      <div style={{display:"flex",flexDirection:"column",height:"calc(var(--vh, 1vh) * 100)",background:C.bg,maxWidth:600,margin:"0 auto"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",borderBottom:`1px solid ${C.border}`,background:C.surface,boxShadow:C.shadow,flexShrink:0}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
             <div style={{width:36,height:36,borderRadius:10,background:C.accent,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 8px rgba(196,125,30,0.35)"}}>
