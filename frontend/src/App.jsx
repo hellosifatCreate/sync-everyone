@@ -975,7 +975,7 @@ export default function App(){
         input,textarea{caret-color:${C.accent};}
         input::placeholder,textarea::placeholder{color:${C.dim};}
       `}</style>
-      <div style={{display:"flex",flexDirection:"column",height:"calc(var(--vh, 1vh) * 100)",background:C.bg,maxWidth:600,margin:"0 auto"}}>
+      <div style={{display:"flex",flexDirection:"column",height:"calc(var(--vh, 1vh) * 100)",background:C.bg,width:"100%"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"12px 16px",borderBottom:`1px solid ${C.border}`,background:C.surface,boxShadow:C.shadow,flexShrink:0}}>
           <div style={{display:"flex",alignItems:"center",gap:10}}>
             <div style={{width:36,height:36,borderRadius:10,background:C.accent,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 8px rgba(196,125,30,0.35)"}}>
