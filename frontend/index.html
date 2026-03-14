@@ -1,76 +1,47 @@
 <!DOCTYPE html>
-<html lang="bn">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>লগইন / সাইন-আপ</title>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content" />
+    <meta name="theme-color" content="#faf8f4" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>Sync Everyone</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #faf8f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .form-container {
-            background: white;
-            padding: 30px 40px;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 320px;
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        label {
-            display: block;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        button {
-            width: 100%;
-            padding: 10px;
-            background-color: #007BFF;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
+      *, *::before, *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html {
+        height: 100%;
+        background: #faf8f4;
+        -webkit-text-size-adjust: 100%;
+      }
+      body {
+        height: 100%;
+        background: #faf8f4;
+        overflow: hidden;
+      }
+      #root {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      /* Prevent zoom AND prevent layout jump on Android */
+      input, textarea, select {
+        font-size: 16px !important;
+        -webkit-appearance: none;
+        appearance: none;
+      }
+      button {
+        touch-action: manipulation;
+      }
     </style>
-</head>
-<body>
-    <div class="form-container">
-        <h2>লগইন / সাইন-আপ</h2>
-        <form id="authForm">
-            <label for="email">ইমেইল</label>
-            <input type="email" id="email" placeholder="ইমেইল লিখুন" required>
-            <label for="password">পাসওয়ার্ড</label>
-            <input type="password" id="password" placeholder="পাসওয়ার্ড লিখুন" required>
-            <button type="submit">লগইন করুন</button>
-        </form>
-    </div>
-    <script>
-        const form = document.getElementById('authForm');
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            // এখানে তোমার লগইন বা সাইন-আপ লজিক বসাবে
-            alert('ফর্ম সাবমিট হয়েছে!');
-        });
-    </script>
-</body>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
 </html>

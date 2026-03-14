@@ -461,7 +461,7 @@ function FeedView({me,onProfile,showToast}){
     try{
       const fd=new FormData();
       fd.append("caption",caption.trim());
-      fd.append("emoji",emoji||"✨");
+      if(emoji) fd.append("emoji",emoji);
       fd.append("tags",tagStr.trim());
       if(imgFile)fd.append("image",imgFile);
       const{data}=await api.post("/posts",fd);
