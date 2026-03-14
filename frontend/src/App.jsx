@@ -312,6 +312,27 @@ function PostCard({post,me,onProfile,onUpdate,onDelete,showToast}){
   );
 }
 
+/* ── Auth Shell ──────────────────────────────────────────── */
+// ✅ Shell কে AuthScreen এর বাইরে রাখা হয়েছে।
+// আগে AuthScreen এর ভেতরে ছিল, তাই প্রতি re-render এ নতুন
+// component তৈরি হত → React পুরো tree unmount/remount করত
+// → input focus হারিয়ে যেত।
+function Shell({children}){
+  return(
+    <div style={{minHeight:"100dvh",background:C.bg,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 16px"}}>
+      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:28}}>
+        <div style={{width:44,height:44,borderRadius:13,background:C.accent,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 12px rgba(196,125,30,0.4)"}}>
+          <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,color:"#fff",fontWeight:700}}>SE</span>
+        </div>
+        <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:24,color:C.text,fontWeight:700}}>Sync Everyone</span>
+      </div>
+      <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:20,padding:"28px 22px",width:"100%",maxWidth:440,boxShadow:C.shadow2}}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
 /* ── AUTH ────────────────────────────────────────────────── */
 function AuthScreen({onLogin}){
   const [mode,setMode]=useState("login");
@@ -366,20 +387,6 @@ function AuthScreen({onLogin}){
     }catch(e){alert(e.response?.data?.error||"Registration failed");}
     setRload(false);
   };
-
-  const Shell=({children})=>(
-    <div style={{minHeight:"100dvh",background:C.bg,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"24px 16px"}}>
-      <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:28}}>
-        <div style={{width:44,height:44,borderRadius:13,background:C.accent,display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 4px 12px rgba(196,125,30,0.4)"}}>
-          <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:20,color:"#fff",fontWeight:700}}>SE</span>
-        </div>
-        <span style={{fontFamily:"'Cormorant Garamond',serif",fontSize:24,color:C.text,fontWeight:700}}>Sync Everyone</span>
-      </div>
-      <div style={{background:C.surface,border:`1px solid ${C.border}`,borderRadius:20,padding:"28px 22px",width:"100%",maxWidth:440,boxShadow:C.shadow2}}>
-        {children}
-      </div>
-    </div>
-  );
 
   if(mode==="login")return(
     <Shell>
