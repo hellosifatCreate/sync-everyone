@@ -1,8 +1,16 @@
 const router = require('express').Router()
 const db     = require('../db')
 const auth   = require('../middleware/auth')
+const multer = require('multer')
+const { storage } = require('../config/cloudinary') // ✅ Cloudinary
 
 const uid = () => Math.random().toString(36).slice(2, 10)
+
+// ── Multer → Cloudinary ───────────────────────────────────
+const uploadMedia = multer({
+  storage,                                    // ✅ local disk এর বদলে Cloudinary
+  limits: { fileSize: 20 * 1024 * 1024 }
+})
 
 // ── GET ALL CONVERSATIONS ─────────────────────────────────
 router.get('/', auth, async (req, res) => {
@@ -79,7 +87,7 @@ router.get('/:convId/messages', auth, async (req, res) => {
   }
 })
 
-// ── SEND MESSAGE ──────────────────────────────────────────
+// ── SEND TEXT MESSAGE ─────────────────────────────────────
 router.post('/:convId/messages', auth, async (req, res) => {
   const { text } = req.body
   if (!text?.trim()) return res.status(400).json({ error: 'Message text required' })
@@ -104,26 +112,7 @@ router.post('/:convId/messages', auth, async (req, res) => {
   }
 })
 
-module.exports = router
-
 // ── SEND MEDIA (photo/voice) ──────────────────────────────
-const multer = require('multer')
-const path = require('path')
-const fs = require('fs')
-
-const mediaStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const dir = path.join(__dirname, '..', process.env.UPLOAD_DIR || 'uploads')
-    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true })
-    cb(null, dir)
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname) || (file.mimetype.includes('audio') ? '.webm' : '.jpg')
-    cb(null, `msg_${req.user.id}_${Date.now()}${ext}`)
-  }
-})
-const uploadMedia = multer({ storage: mediaStorage, limits: { fileSize: 20 * 1024 * 1024 } })
-
 router.post('/:convId/messages/media', auth, uploadMedia.single('media'), async (req, res) => {
   const { type } = req.body
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
@@ -133,8 +122,10 @@ router.post('/:convId/messages/media', auth, uploadMedia.single('media'), async 
       [req.params.convId, req.user.id]
     )
     if (!membership.length) return res.status(403).json({ error: 'Access denied' })
-    const id = 'm' + Math.random().toString(36).slice(2, 10)
-    const mediaUrl = `/uploads/${req.file.filename}`
+
+    const id = 'm' + uid()
+    const mediaUrl = req.file.path   // ✅ Cloudinary HTTPS URL
+
     await db.query(
       'INSERT INTO messages (id,conversation_id,user_id,text,media_url,media_type) VALUES (?,?,?,?,?,?)',
       [id, req.params.convId, req.user.id, '', mediaUrl, type || 'image']
@@ -149,3 +140,6 @@ router.post('/:convId/messages/media', auth, uploadMedia.single('media'), async 
     res.status(500).json({ error: 'Server error: ' + err.message })
   }
 })
+
+// ✅ সবার শেষে module.exports
+module.exports = router
